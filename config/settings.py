@@ -33,21 +33,22 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+
     "rest_framework",
-    "corsheaders",
     "rest_framework_simplejwt",
+    "corsheaders",
+    "djoser",
     "django_celery_beat",
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "drf_spectacular",
 
     "habits",
     "users",
-    "djoser",
-    "drf_spectacular",
 ]
 
 MIDDLEWARE = [

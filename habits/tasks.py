@@ -1,6 +1,3 @@
-
-from datetime import timedelta
-
 from celery import shared_task
 from django.utils import timezone
 
@@ -9,23 +6,21 @@ from .services import send_telegram_message
 
 
 @shared_task
-def send_habit_reminders():
+def send_habit_reminders() -> None:
     now = timezone.localtime()
     current_time = now.time().replace(second=0, microsecond=0)
     today = now.date()
 
-    # Берём только полезные, не приятные привычки
     habits = Habit.objects.filter(
         is_pleasant=False,
         time=current_time,
     )
 
     for habit in habits:
-        last = habit.last_reminder
-        if last is not None:
-            days_passed = (today - last).days
+        # периодичность: не чаще, чем каждые N дней
+        if habit.last_reminder is not None:
+            days_passed = (today - habit.last_reminder).days
             if days_passed < habit.periodicity:
-                # Ещё рано напоминать
                 continue
 
         user = habit.owner
