@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class TelegramProfile(models.Model):
@@ -21,3 +22,13 @@ class TelegramProfile(models.Model):
 
     def __str__(self) -> str:
         return f"Telegram профиль {self.user} ({self.chat_id})"
+
+
+class User(AbstractUser):
+    """Custom user model based on AbstractUser."""
+    telegram_chat_id = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True,
+        help_text="Telegram chat_id for notifications",
+    )
