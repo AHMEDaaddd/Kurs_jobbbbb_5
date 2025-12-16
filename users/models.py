@@ -1,34 +1,22 @@
-from django.conf import settings
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-
-
-class TelegramProfile(models.Model):
-    """
-    Профиль пользователя для интеграции с Telegram.
-    Храним chat_id для отправки напоминаний.
-    """
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="telegram_profile",
-        verbose_name="Пользователь",
-    )
-    chat_id = models.CharField(
-        "Telegram chat_id",
-        max_length=64,
-        unique=True,
-    )
-
-    def __str__(self) -> str:
-        return f"Telegram профиль {self.user} ({self.chat_id})"
+from django.db import models
 
 
 class User(AbstractUser):
-    """Custom user model based on AbstractUser."""
-    telegram_chat_id = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True,
-        help_text="Telegram chat_id for notifications",
-    )
+    """
+    Кастомная модель пользователя.
+    При необходимости можно расширять полями (телефон, аватар и т.п.).
+    """
+    # пример расширения (не обязательно):
+    # telegram_id = models.CharField(max_length=64, blank=True, null=True)
+
+    def __str__(self) -> str:
+        return self.username
+
+
+class TelegramProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="telegram_profile")
+    telegram_chat_id = models.CharField(max_length=128, unique=True)
+
+    def __str__(self) -> str:
+        return f"{self.user.username}: {self.telegram_chat_id}"
