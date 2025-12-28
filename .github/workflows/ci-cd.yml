@@ -1,0 +1,55 @@
+name: Django CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations (SQLite)
+        run: python manage.py migrate
+
+      - name: Run tests
+        run: python manage.py test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd /home/deploy/habit_project/Kurs_jobbbbb_5
+          git pull origin main
+          source ../venv/bin/activate
+          pip install -r requirements.txt
+          python manage.py migrate
+          python manage.py collectstatic --noinput
+          sudo systemctl restart habit_app
+          EOF
