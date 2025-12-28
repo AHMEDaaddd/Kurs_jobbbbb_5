@@ -25,8 +25,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run migrations (SQLite)
-        run: python manage.py migrate
+      - name: Apply migrations before tests
+        run: python manage.py migrate --noinput
 
       - name: Run tests
         run: python manage.py test
@@ -49,7 +49,7 @@ jobs:
           git pull origin main
           source ../venv/bin/activate
           pip install -r requirements.txt
-          python manage.py migrate
+          python manage.py migrate --noinput
           python manage.py collectstatic --noinput
           sudo systemctl restart habit_app
           EOF
